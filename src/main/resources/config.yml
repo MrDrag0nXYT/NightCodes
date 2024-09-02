@@ -15,7 +15,7 @@ commands:
   - 'p give %player% 5'
 
 requirements:
-  # Minimal played time (in seconds, for example 1 hour = 3600)
+  # Minimal played time for activation code (in seconds, for example 1 hour = 3600)
   played_time: 3600
 
 # Database available types:
