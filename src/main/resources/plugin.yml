@@ -1,0 +1,63 @@
+name: NightCodes
+version: '${version}'
+main: zxc.mrdrag0nxyt.nightcodes.NightCodes
+api-version: '1.16'
+authors: [MrDrag0nXYT (drakoshaslv)]
+website: https://drakoshaslv.ru
+description: 'Let your players create referral codes!'
+
+commands:
+  referral:
+    aliases:
+      - ref
+    usage: /<command> <subcommand>
+    description: 'Manage referral codes'
+
+  code:
+    usage: /<command> code
+    description: 'Activate referral codes'
+
+  nightcodes:
+    aliases:
+      - ncodes
+    usage: /<command> help
+    description: 'Admin actions for NightCodes'
+
+permissions:
+  nightcodes.player.create:
+    default: true
+  nightcodes.player.delete:
+    default: true
+  nightcodes.player.pause:
+    default: true
+  nightcodes.player.unpause:
+    default: true
+  nightcodes.player.stats:
+    default: true
+  nightcodes.player.activate:
+    default: true
+
+  nightcodes.admin.reload:
+    default: op
+
+  nightcodes.player.*:
+    default: true
+    children:
+      nightcodes.player.create: true
+      nightcodes.player.delete: true
+      nightcodes.player.pause: true
+      nightcodes.player.unpause: true
+      nightcodes.player.stats: true
+      nightcodes.player.activate: true
+
+  nightcodes.admin.*:
+    default: op
+    children:
+      nightcodes.player.*: true
+      nightcodes.admin.reload: true
+
+  nightcodes.*:
+    default: op
+    children:
+      nightcodes.admin.*: true
+      nightcodes.player.*: true

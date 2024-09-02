@@ -1,0 +1,88 @@
+global:
+  only-for-players:
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Эта команда <#d45079>не доступна</#d45079> из консоли!'
+  no-permission:
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>У вас недостаточно прав <#d45079>не доступна</#d45079> из консоли!'
+  database-error:
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>При выполнении действия в базе данных <#d45079>произошла ошибка</#d45079>!'
+
+#
+# Placeholders:
+#  - %player% - Player name
+#
+referral:
+  created:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Промо-код <#745c97>%player%</#745c97> успешно создан!'
+    - '  <#c0c0c0>‣ <#fcfcfc>Для активации игрокам необходимо использовать <#745c97>/code %player%</#745c97>'
+    - ''
+  deleted:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Промо-код <#745c97>%player%</#745c97> успешно удалён!'
+    - ''
+  paused:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Активация промо-кода <#745c97>%player%</#745c97> успешно приостановлена!'
+    - ''
+  already-paused:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Активация промо-кода <#745c97>%player%</#745c97> <#d45079>уже была приостановлена</#d45079>!'
+    - ''
+  unpaused:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Активация промо-кода <#745c97>%player%</#745c97> успешно восстановлена!'
+    - ''
+  already-unpaused:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Активация промо-кода <#745c97>%player%</#745c97> <#d45079>уже была восстановлена</#d45079>!'
+    - ''
+  usage:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Информация'
+    - '  <#c0c0c0>‣ <#745c97>/referral create <#c0c0c0>- <#fcfcfc>создать промо-код'
+    - '  <#c0c0c0>‣ <#745c97>/referral delete <#c0c0c0>- <#fcfcfc>удалить промо-код'
+    - '  <#c0c0c0>‣ <#745c97>/referral pause <#c0c0c0>- <#fcfcfc>приостановить использование промо-кода'
+    - '  <#c0c0c0>‣ <#745c97>/referral unpause <#c0c0c0>- <#fcfcfc>восстановить использование промо-кода'
+    - '  <#c0c0c0>‣ <#745c97>/referral stats <#c0c0c0>- <#fcfcfc>посмотреть статистику промо-кода'
+    - ''
+  exists:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>У вас уже есть промо-код <#745c97>%player%</#745c97>'
+    - ''
+  not-exist:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>У вас ещё нет промо-кода! Создайте его через <#745c97>/referral create</#745c97>'
+    - ''
+  stats:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Статистика использования промо-кода <#745c97>%player%</#745c97>:'
+    - '  <#c0c0c0>‣ <#fcfcfc>Промокод использован <#745c97>%count%</#745c97> раз'
+    - '  <#c0c0c0>‣ <#fcfcfc>Использование промо-кода <#745c97>%state%</#745c97>'
+    - ''
+  state:
+    paused: '<#d45079>приостановлено</#d45079>'
+    unpaused: '<#ace1af>активно</#ace1af>'
+
+code:
+  not-found:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Промо-код <#745c97>%referral_code%</#745c97> <#d45079>не найден</#d45079>'
+    - ''
+  activated:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Вы <#ace1af>успешно</#ace1af> активировали промо-код <#745c97>%referral_code%</#745c97>!'
+    - ''
+  already-activated:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Вы <#d45079>уже активировали</#d45079> промо-код!'
+    - ''
+  autocomplete-placeholder: 'промокод'
+
+nightcodes:
+  usage:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Информация'
+    - '  <#c0c0c0>‣ <#745c97>/nightcodes reload <#c0c0c0>- <#fcfcfc>перезагрузить плагин'
+    - ''
+  reloaded:
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Плагин <#ace1af>успешно</#ace1af> перезагружен!'
