@@ -5,6 +5,7 @@ import zxc.mrdrag0nxyt.nightcodes.NightCodes;
 import zxc.mrdrag0nxyt.nightcodes.util.Utilities;
 
 import java.io.File;
+import java.util.Arrays;
 
 public class Config {
 
@@ -26,6 +27,8 @@ public class Config {
         config = YamlConfiguration.loadConfiguration(file);
 
         Utilities.checkValue(config, "database.type", "SQLITE");
+        Utilities.checkValue(config, "commands", 3600L);
+        Utilities.checkValue(config, "requirements.played_time", Arrays.asList("betterdonate give %codeOwner% money 3500", "p give %codeOwner% 10", "p give %player% 5"));
         save();
     }
 

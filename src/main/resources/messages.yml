@@ -77,6 +77,11 @@ code:
     - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Вы <#d45079>уже активировали</#d45079> промо-код!'
     - ''
   autocomplete-placeholder: 'промокод'
+  requirements:
+    time:
+      - ''
+      - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Для активации промо-кода необходимо наиграть минимум <#745c97>1 час</#745c97>'
+      - ''
 
 nightcodes:
   usage:

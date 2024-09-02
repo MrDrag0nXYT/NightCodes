@@ -1,5 +1,7 @@
 package zxc.mrdrag0nxyt.nightcodes.command;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Statistic;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -37,6 +39,7 @@ public class CodeCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         YamlConfiguration messages = this.messages.getConfig();
+        YamlConfiguration config = this.config.getConfig();
 
         if (args.length == 0) {
             for (String message : messages.getStringList("referral.usage"))
@@ -52,33 +55,56 @@ public class CodeCommand implements CommandExecutor, TabCompleter {
 
         Player player = (Player) sender;
 
-        try (Connection connection = database.getConnection()) {
-
-            database.getDatabaseWorker().useCode(
-                    connection,
-                    player.getName(),
-                    player.getUniqueId(),
-                    args[0]
-            );
-
-            for (String message : messages.getStringList("code.activated"))
+        if ((player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20) <= config.getLong("requirements.played_time", 3600L)) {
+            for (String message : messages.getStringList("code.requirements.time"))
                 plugin.adventure().sender(sender).sendMessage(
-                        Utilities.setColor(message.replace("%referral_code%", args[0]))
+                        Utilities.setColor(message)
+                );
+            return true;
+        }
+
+        if (sender.hasPermission("nightcodes.player.activate")) {
+            try (Connection connection = database.getConnection()) {
+
+                database.getDatabaseWorker().useCode(
+                        connection,
+                        player.getName(),
+                        player.getUniqueId(),
+                        args[0]
                 );
 
-        } catch (SQLException e) {
-            for (String message : messages.getStringList("global.database-error"))
-                plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+                for (String bonusCommand : config.getStringList("commands")) {
+                    bonusCommand = bonusCommand
+                            .replace("%codeOwner%", args[0])
+                            .replace("%player%", player.getName());
 
-        } catch (CodeNotFoundException e) {
-            for (String message : messages.getStringList("code.not-found"))
-                plugin.adventure().sender(sender).sendMessage(
-                        Utilities.setColor(message.replace("%referral_code%", args[0]))
-                );
+                    plugin.getServer().dispatchCommand(Bukkit.getConsoleSender(), bonusCommand);
+                }
 
-        } catch (CodeAlreadyUsedException e) {
-            for (String message : messages.getStringList("code.already-activated"))
+                for (String message : messages.getStringList("code.activated"))
+                    plugin.adventure().sender(sender).sendMessage(
+                            Utilities.setColor(message.replace("%referral_code%", args[0]))
+                    );
+
+            } catch (SQLException e) {
+                for (String message : messages.getStringList("global.database-error"))
+                    plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+
+            } catch (CodeNotFoundException e) {
+                for (String message : messages.getStringList("code.not-found"))
+                    plugin.adventure().sender(sender).sendMessage(
+                            Utilities.setColor(message.replace("%referral_code%", args[0]))
+                    );
+
+            } catch (CodeAlreadyUsedException e) {
+                for (String message : messages.getStringList("code.already-activated"))
+                    plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+            }
+
+        } else {
+            for (String message : messages.getStringList("global.no-permission"))
                 plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+            return true;
         }
 
         return true;

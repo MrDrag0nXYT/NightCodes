@@ -1,4 +1,23 @@
 
+#
+# Commands that will be executed on code activation
+#
+# Placeholders:
+#  - %codeOwner% - creator of code
+#  - %player% - player that activated code
+#
+# Please remind that commands can be executed when creator of code offline
+#  - Need to run ONLY when player online? You may be interested: https://github.com/MrDrag0nXYT/BetterDonate
+#
+commands:
+  - 'betterdonate give %codeOwner% money 3500'
+  - 'p give %codeOwner% 10'
+  - 'p give %player% 5'
+
+requirements:
+  # Minimal played time (in seconds, for example 1 hour = 3600)
+  played_time: 3600
+
 # Database available types:
 #   - SQLITE
 database:

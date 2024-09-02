@@ -50,6 +50,23 @@ public class NightCodesCommand implements CommandExecutor, TabCompleter {
                 }
                 break;
 
+            case "about":
+                if (sender.hasPermission("nightcodes.admin.about")) {
+
+                    List<String> aboutStrings = Arrays.asList(
+                            " ",
+                            " <#fcfcfc><#745c97>NightCodes</#745c97> plugin by <click:open_url:'https://drakoshaslv.ru'><#745c97>MrDrag0nXYT</#745c97></click></#fcfcfc>",
+                            " <#fcfcfc>Made specially for <click:open_url:'https://nshard.ru'><#745c97>NightShard</#745c97></click></#fcfcfc>",
+                            " "
+                    );
+
+                    for (String message : aboutStrings)
+                        plugin.adventure().sender(sender).sendMessage(
+                                MiniMessage.miniMessage().deserialize(message)
+                        );
+                }
+                break;
+
             default:
                 for (String message : messages.getStringList("nightcodes.usage"))
                     plugin.adventure().sender(sender).sendMessage(
