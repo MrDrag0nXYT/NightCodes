@@ -1,29 +1,34 @@
-package zxc.mrdrag0nxyt.nightcodes.util.config;
+package zxc.mrdrag0nxyt.nightcodes.config;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import zxc.mrdrag0nxyt.nightcodes.NightCodes;
+import zxc.mrdrag0nxyt.nightcodes.util.Utilities;
 
 import java.io.File;
+import java.util.Arrays;
 
-public class Messages {
+public class Config {
 
     private final NightCodes plugin;
     private File file;
     private YamlConfiguration config;
 
-    public Messages(NightCodes plugin) {
+    public Config(NightCodes plugin) {
         this.plugin = plugin;
 
         load();
     }
 
     private void load() {
-        file = new File(plugin.getDataFolder(), "messages.yml");
+        file = new File(plugin.getDataFolder(), "config.yml");
         if (!file.exists()) {
-            plugin.saveResource("messages.yml", false);
+            plugin.saveResource("config.yml", false);
         }
         config = YamlConfiguration.loadConfiguration(file);
 
+        Utilities.checkValue(config, "database.type", "SQLITE");
+        Utilities.checkValue(config, "commands", 3600L);
+        Utilities.checkValue(config, "requirements.played_time", Arrays.asList("betterdonate give %codeOwner% money 3500", "p give %codeOwner% 10", "p give %player% 5"));
         save();
     }
 

@@ -2,13 +2,14 @@ package zxc.mrdrag0nxyt.nightcodes;
 
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 import zxc.mrdrag0nxyt.nightcodes.command.CodeCommand;
 import zxc.mrdrag0nxyt.nightcodes.command.NightCodesCommand;
 import zxc.mrdrag0nxyt.nightcodes.command.ReferralCommand;
-import zxc.mrdrag0nxyt.nightcodes.util.config.Config;
+import zxc.mrdrag0nxyt.nightcodes.config.Config;
 import zxc.mrdrag0nxyt.nightcodes.util.database.DatabaseManager;
-import zxc.mrdrag0nxyt.nightcodes.util.config.Messages;
+import zxc.mrdrag0nxyt.nightcodes.config.Messages;
 import zxc.mrdrag0nxyt.nightcodes.util.database.DatabaseWorker;
 
 import java.sql.Connection;
@@ -44,6 +45,10 @@ public final class NightCodes extends JavaPlugin {
             worker.initUsedCodeTable(connection);
         } catch (SQLException e) {
             getLogger().severe(String.valueOf(e));
+        }
+
+        if (config.getConfig().getBoolean("enable-metrics", true)) {
+            new Metrics(this, 24236);
         }
 
         getCommand("referral").setExecutor(new ReferralCommand(this, config, messages, databaseManager));

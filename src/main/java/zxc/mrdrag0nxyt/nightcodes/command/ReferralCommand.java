@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import zxc.mrdrag0nxyt.nightcodes.NightCodes;
 import zxc.mrdrag0nxyt.nightcodes.entity.ReferralCode;
 import zxc.mrdrag0nxyt.nightcodes.util.Utilities;
-import zxc.mrdrag0nxyt.nightcodes.util.config.*;
+import zxc.mrdrag0nxyt.nightcodes.config.*;
 import zxc.mrdrag0nxyt.nightcodes.util.database.DatabaseManager;
 import zxc.mrdrag0nxyt.nightcodes.util.exception.CodeNotFoundException;
 

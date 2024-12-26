@@ -2,6 +2,7 @@ package zxc.mrdrag0nxyt.nightcodes.util.database.implementation;
 
 import zxc.mrdrag0nxyt.nightcodes.entity.ReferralCode;
 import zxc.mrdrag0nxyt.nightcodes.util.database.DatabaseWorker;
+import zxc.mrdrag0nxyt.nightcodes.util.exception.CannotActivateOwnCodeException;
 import zxc.mrdrag0nxyt.nightcodes.util.exception.CodeAlreadyUsedException;
 import zxc.mrdrag0nxyt.nightcodes.util.exception.CodeNotFoundException;
 
@@ -120,7 +121,6 @@ public class SQLiteDatabaseWorker implements DatabaseWorker {
     }
 
 
-
     // Used codes table
 
     @Override
@@ -139,7 +139,7 @@ public class SQLiteDatabaseWorker implements DatabaseWorker {
     }
 
     @Override
-    public void useCode(Connection connection, String username, UUID uuid, String referralCode) throws SQLException, CodeNotFoundException, CodeAlreadyUsedException {
+    public void useCode(Connection connection, String username, UUID uuid, String referralCode) throws SQLException, CodeNotFoundException, CodeAlreadyUsedException, CannotActivateOwnCodeException {
         String searchCodeSql = "SELECT * FROM referral_codes WHERE username = ?";
 
         PreparedStatement searchStatement = connection.prepareStatement(searchCodeSql);
@@ -154,6 +154,10 @@ public class SQLiteDatabaseWorker implements DatabaseWorker {
                     searchResultSet.getByte("is_paused"),
                     searchResultSet.getLong("usages")
             );
+
+            if (foundCode.getUsername().equals(username)) {
+                throw new CannotActivateOwnCodeException();
+            }
         } else {
             throw new CodeNotFoundException();
         }

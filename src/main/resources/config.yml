@@ -9,6 +9,10 @@
 # Please remind that commands can be executed when creator of code offline
 #  - Need to run ONLY when player online? You may be interested: https://github.com/MrDrag0nXYT/BetterDonate
 #
+
+# Enable bStats metrics? You can see it here: https://bstats.org/plugin/bukkit/NightCodes/24236
+enable-metrics: true
+
 commands:
   - 'betterdonate give %codeOwner% money 3500'
   - 'p give %codeOwner% 10'

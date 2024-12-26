@@ -9,7 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 import zxc.mrdrag0nxyt.nightcodes.NightCodes;
 import zxc.mrdrag0nxyt.nightcodes.util.Utilities;
-import zxc.mrdrag0nxyt.nightcodes.util.config.*;
+import zxc.mrdrag0nxyt.nightcodes.config.*;
 
 import java.util.Arrays;
 import java.util.Collections;

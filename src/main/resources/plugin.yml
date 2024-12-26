@@ -6,6 +6,9 @@ authors: [MrDrag0nXYT (drakoshaslv)]
 website: https://drakoshaslv.ru
 description: 'Let your players create referral codes!'
 
+libraries:
+  - "com.zaxxer:HikariCP:5.1.0"
+
 commands:
   referral:
     aliases:

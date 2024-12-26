@@ -11,9 +11,10 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import zxc.mrdrag0nxyt.nightcodes.NightCodes;
 import zxc.mrdrag0nxyt.nightcodes.util.Utilities;
-import zxc.mrdrag0nxyt.nightcodes.util.config.Config;
-import zxc.mrdrag0nxyt.nightcodes.util.config.Messages;
+import zxc.mrdrag0nxyt.nightcodes.config.Config;
+import zxc.mrdrag0nxyt.nightcodes.config.Messages;
 import zxc.mrdrag0nxyt.nightcodes.util.database.DatabaseManager;
+import zxc.mrdrag0nxyt.nightcodes.util.exception.CannotActivateOwnCodeException;
 import zxc.mrdrag0nxyt.nightcodes.util.exception.CodeAlreadyUsedException;
 import zxc.mrdrag0nxyt.nightcodes.util.exception.CodeNotFoundException;
 
@@ -98,6 +99,10 @@ public class CodeCommand implements CommandExecutor, TabCompleter {
 
             } catch (CodeAlreadyUsedException e) {
                 for (String message : messages.getStringList("code.already-activated"))
+                    plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+
+            } catch (CannotActivateOwnCodeException e) {
+                for (String message : messages.getStringList("code.cannot-activate-own-code"))
                     plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
             }
 

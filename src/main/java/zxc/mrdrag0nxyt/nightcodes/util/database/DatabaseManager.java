@@ -5,7 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import org.bukkit.configuration.file.YamlConfiguration;
 import zxc.mrdrag0nxyt.nightcodes.NightCodes;
-import zxc.mrdrag0nxyt.nightcodes.util.config.Config;
+import zxc.mrdrag0nxyt.nightcodes.config.Config;
 import zxc.mrdrag0nxyt.nightcodes.util.database.implementation.SQLiteDatabaseWorker;
 
 import java.io.File;

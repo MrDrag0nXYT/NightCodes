@@ -76,6 +76,10 @@ code:
     - ''
     - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Вы <#d45079>уже активировали</#d45079> промо-код!'
     - ''
+  cannot-activate-own-code:
+    - ''
+    - ' <#745c97>NightCodes <#c0c0c0>› <#fcfcfc>Вы <#d45079>не можете</#d45079> активировать свой промо-код!'
+    - ''
   autocomplete-placeholder: 'промокод'
   requirements:
     time:
