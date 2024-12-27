@@ -1,5 +1,6 @@
 package zxc.mrdrag0nxyt.nightcodes.command;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -40,17 +41,15 @@ public class ReferralCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 0) {
             for (String message : messages.getStringList("referral.usage"))
-                plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+                sender.sendMessage(Utilities.setColor(message));
             return true;
         }
 
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             for (String message : messages.getStringList("global.only-for-players"))
-                plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+                sender.sendMessage(Utilities.setColor(message));
             return true;
         }
-
-        Player player = (Player) sender;
 
 
         // todo: work with UUID
@@ -59,70 +58,71 @@ public class ReferralCommand implements CommandExecutor, TabCompleter {
             case "create":
                 if (sender.hasPermission("nightcodes.player.create")) {
 
-                    try (Connection connection = database.getConnection()) {
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                        try (Connection connection = database.getConnection()) {
 
-                        try {
-                            ReferralCode checkCode = database.getDatabaseWorker().getReferralCodeByUsername(connection, player.getName());
+                            try {
+                                ReferralCode checkCode = database.getDatabaseWorker().getReferralCodeByUsername(connection, player.getName());
 
-                            for (String message : messages.getStringList("referral.exists"))
-                                plugin.adventure().sender(sender).sendMessage(
-                                        Utilities.setColor(message.replace("%player%", player.getName()))
-                                );
-                            return true;
+                                for (String message : messages.getStringList("referral.exists"))
+                                    sender.sendMessage(
+                                            Utilities.setColor(message.replace("%player%", player.getName()))
+                                    );
 
-                        } catch (CodeNotFoundException e) {
-                            ReferralCode code = new ReferralCode(player.getName(), player.getUniqueId());
-                            database.getDatabaseWorker().createReferralCode(connection, code);
+                            } catch (CodeNotFoundException e) {
+                                ReferralCode code = new ReferralCode(player.getName(), player.getUniqueId());
+                                database.getDatabaseWorker().createReferralCode(connection, code);
 
-                            for (String message : messages.getStringList("referral.created"))
-                                plugin.adventure().sender(sender).sendMessage(
-                                        Utilities.setColor(message.replace("%player%", player.getName()))
-                                );
+                                for (String message : messages.getStringList("referral.created"))
+                                    sender.sendMessage(
+                                            Utilities.setColor(message.replace("%player%", player.getName()))
+                                    );
+                            }
+
+                        } catch (SQLException e) {
+                            for (String message : messages.getStringList("global.database-error"))
+                                sender.sendMessage(Utilities.setColor(message));
                         }
-
-                    } catch (SQLException e) {
-                        for (String message : messages.getStringList("global.database-error"))
-                            plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
-                    }
+                    });
 
                 } else {
                     for (String message : messages.getStringList("global.no-permission"))
-                        plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+                        sender.sendMessage(Utilities.setColor(message));
                 }
                 break;
 
             case "delete":
                 if (sender.hasPermission("nightcodes.player.delete")) {
 
-                    try (Connection connection = database.getConnection()) {
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                        try (Connection connection = database.getConnection()) {
 
-                        try {
-                            ReferralCode checkCode = database.getDatabaseWorker().getReferralCodeByUsername(connection, player.getName());
+                            try {
+                                ReferralCode checkCode = database.getDatabaseWorker().getReferralCodeByUsername(connection, player.getName());
 
-                            database.getDatabaseWorker().deleteReferralCode(connection, player.getName());
+                                database.getDatabaseWorker().deleteReferralCode(connection, player.getName());
 
-                            for (String message : messages.getStringList("referral.deleted"))
-                                plugin.adventure().sender(sender).sendMessage(
-                                        Utilities.setColor(message.replace("%player%", player.getName()))
-                                );
+                                for (String message : messages.getStringList("referral.deleted"))
+                                    sender.sendMessage(
+                                            Utilities.setColor(message.replace("%player%", player.getName()))
+                                    );
 
-                        } catch (CodeNotFoundException e) {
-                            for (String message : messages.getStringList("referral.not-exist"))
-                                plugin.adventure().sender(sender).sendMessage(
-                                        Utilities.setColor(message.replace("%player%", player.getName()))
-                                );
-                            return true;
+                            } catch (CodeNotFoundException e) {
+                                for (String message : messages.getStringList("referral.not-exist"))
+                                    sender.sendMessage(
+                                            Utilities.setColor(message.replace("%player%", player.getName()))
+                                    );
+                            }
+
+                        } catch (SQLException e) {
+                            for (String message : messages.getStringList("global.database-error"))
+                                sender.sendMessage(Utilities.setColor(message));
                         }
-
-                    } catch (SQLException e) {
-                        for (String message : messages.getStringList("global.database-error"))
-                            plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
-                        return true;
-                    }
+                    });
 
                 } else {
                     for (String message : messages.getStringList("global.no-permission"))
-                        plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+                        sender.sendMessage(Utilities.setColor(message));
                     return true;
                 }
                 break;
@@ -130,43 +130,43 @@ public class ReferralCommand implements CommandExecutor, TabCompleter {
             case "pause":
                 if (sender.hasPermission("nightcodes.player.pause")) {
 
-                    try (Connection connection = database.getConnection()) {
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                        try (Connection connection = database.getConnection()) {
 
-                        try {
-                            ReferralCode checkCode = database.getDatabaseWorker().getReferralCodeByUsername(connection, player.getName());
+                            try {
+                                ReferralCode checkCode = database.getDatabaseWorker().getReferralCodeByUsername(connection, player.getName());
 
-                            if (checkCode.getIsPaused() == 1) {
-                                for (String message : messages.getStringList("referral.already-paused"))
-                                    plugin.adventure().sender(sender).sendMessage(
+                                if (checkCode.getIsPaused() == 1) {
+                                    for (String message : messages.getStringList("referral.already-paused"))
+                                        sender.sendMessage(
+                                                Utilities.setColor(message.replace("%player%", player.getName()))
+                                        );
+                                    return;
+                                }
+
+                                database.getDatabaseWorker().setPaused(connection, player.getName(), (byte) 1);
+
+                                for (String message : messages.getStringList("referral.paused"))
+                                    sender.sendMessage(
                                             Utilities.setColor(message.replace("%player%", player.getName()))
                                     );
-                                return true;
+
+                            } catch (CodeNotFoundException e) {
+                                for (String message : messages.getStringList("referral.not-exist"))
+                                    sender.sendMessage(
+                                            Utilities.setColor(message.replace("%player%", player.getName()))
+                                    );
                             }
 
-                            database.getDatabaseWorker().setPaused(connection, player.getName(), (byte) 1);
-
-                            for (String message : messages.getStringList("referral.paused"))
-                                plugin.adventure().sender(sender).sendMessage(
-                                        Utilities.setColor(message.replace("%player%", player.getName()))
-                                );
-
-                        } catch (CodeNotFoundException e) {
-                            for (String message : messages.getStringList("referral.not-exist"))
-                                plugin.adventure().sender(sender).sendMessage(
-                                        Utilities.setColor(message.replace("%player%", player.getName()))
-                                );
-                            return true;
+                        } catch (SQLException e) {
+                            for (String message : messages.getStringList("global.database-error"))
+                                sender.sendMessage(Utilities.setColor(message));
                         }
-
-                    } catch (SQLException e) {
-                        for (String message : messages.getStringList("global.database-error"))
-                            plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
-                        return true;
-                    }
+                    });
 
                 } else {
                     for (String message : messages.getStringList("global.no-permission"))
-                        plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+                        sender.sendMessage(Utilities.setColor(message));
                     return true;
                 }
                 break;
@@ -174,43 +174,43 @@ public class ReferralCommand implements CommandExecutor, TabCompleter {
             case "unpause":
                 if (sender.hasPermission("nightcodes.player.unpause")) {
 
-                    try (Connection connection = database.getConnection()) {
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                        try (Connection connection = database.getConnection()) {
 
-                        try {
-                            ReferralCode checkCode = database.getDatabaseWorker().getReferralCodeByUsername(connection, player.getName());
+                            try {
+                                ReferralCode checkCode = database.getDatabaseWorker().getReferralCodeByUsername(connection, player.getName());
 
-                            if (checkCode.getIsPaused() != 1) {
-                                for (String message : messages.getStringList("referral.already-unpaused"))
-                                    plugin.adventure().sender(sender).sendMessage(
+                                if (checkCode.getIsPaused() != 1) {
+                                    for (String message : messages.getStringList("referral.already-unpaused"))
+                                        sender.sendMessage(
+                                                Utilities.setColor(message.replace("%player%", player.getName()))
+                                        );
+                                    return;
+                                }
+
+                                database.getDatabaseWorker().setPaused(connection, player.getName(), (byte) 0);
+
+                                for (String message : messages.getStringList("referral.unpaused"))
+                                    sender.sendMessage(
                                             Utilities.setColor(message.replace("%player%", player.getName()))
                                     );
-                                return true;
+
+                            } catch (CodeNotFoundException e) {
+                                for (String message : messages.getStringList("referral.not-exist"))
+                                    sender.sendMessage(
+                                            Utilities.setColor(message.replace("%player%", player.getName()))
+                                    );
                             }
 
-                            database.getDatabaseWorker().setPaused(connection, player.getName(), (byte) 0);
-
-                            for (String message : messages.getStringList("referral.unpaused"))
-                                plugin.adventure().sender(sender).sendMessage(
-                                        Utilities.setColor(message.replace("%player%", player.getName()))
-                                );
-
-                        } catch (CodeNotFoundException e) {
-                            for (String message : messages.getStringList("referral.not-exist"))
-                                plugin.adventure().sender(sender).sendMessage(
-                                        Utilities.setColor(message.replace("%player%", player.getName()))
-                                );
-                            return true;
+                        } catch (SQLException e) {
+                            for (String message : messages.getStringList("global.database-error"))
+                                sender.sendMessage(Utilities.setColor(message));
                         }
-
-                    } catch (SQLException e) {
-                        for (String message : messages.getStringList("global.database-error"))
-                            plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
-                        return true;
-                    }
+                    });
 
                 } else {
                     for (String message : messages.getStringList("global.no-permission"))
-                        plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+                        sender.sendMessage(Utilities.setColor(message));
                     return true;
                 }
                 break;
@@ -218,47 +218,47 @@ public class ReferralCommand implements CommandExecutor, TabCompleter {
             case "stats":
                 if (sender.hasPermission("nightcodes.player.stats")) {
 
-                    try (Connection connection = database.getConnection()) {
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                        try (Connection connection = database.getConnection()) {
 
-                        try {
-                            ReferralCode checkCode = database.getDatabaseWorker().getReferralCodeByUsername(connection, player.getName());
+                            try {
+                                ReferralCode checkCode = database.getDatabaseWorker().getReferralCodeByUsername(connection, player.getName());
 
-                            String state = checkCode.getIsPaused() == 1 ? messages.getString("referral.state.paused", "<#d45079>paused</#d45079>") : messages.getString("referral.state.unpaused", "<#ace1af>active</#ace1af>");
+                                String state = checkCode.getIsPaused() == 1 ? messages.getString("referral.state.paused", "<#d45079>paused</#d45079>") : messages.getString("referral.state.unpaused", "<#ace1af>active</#ace1af>");
 
-                            for (String message : messages.getStringList("referral.stats"))
-                                plugin.adventure().sender(sender).sendMessage(
-                                        Utilities.setColor(
-                                                message
-                                                        .replace("%player%", player.getName())
-                                                        .replace("%count%", String.valueOf(checkCode.getUsages()))
-                                                        .replace("%state%", state)
-                                        )
-                                );
+                                for (String message : messages.getStringList("referral.stats"))
+                                    sender.sendMessage(
+                                            Utilities.setColor(
+                                                    message
+                                                            .replace("%player%", player.getName())
+                                                            .replace("%count%", String.valueOf(checkCode.getUsages()))
+                                                            .replace("%state%", state)
+                                            )
+                                    );
 
-                        } catch (CodeNotFoundException e) {
-                            for (String message : messages.getStringList("referral.not-exist"))
-                                plugin.adventure().sender(sender).sendMessage(
-                                        Utilities.setColor(message.replace("%player%", player.getName()))
-                                );
-                            return true;
+                            } catch (CodeNotFoundException e) {
+                                for (String message : messages.getStringList("referral.not-exist"))
+                                    sender.sendMessage(
+                                            Utilities.setColor(message.replace("%player%", player.getName()))
+                                    );
+                            }
+
+                        } catch (SQLException e) {
+                            for (String message : messages.getStringList("global.database-error"))
+                                sender.sendMessage(Utilities.setColor(message));
                         }
-
-                    } catch (SQLException e) {
-                        for (String message : messages.getStringList("global.database-error"))
-                            plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
-                        return true;
-                    }
+                    });
 
                 } else {
                     for (String message : messages.getStringList("global.no-permission"))
-                        plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+                        sender.sendMessage(Utilities.setColor(message));
                     return true;
                 }
                 break;
 
             default:
                 for (String message : messages.getStringList("referral.usage"))
-                    plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+                    sender.sendMessage(Utilities.setColor(message));
                 return true;
         }
 

@@ -2,12 +2,13 @@ name: NightCodes
 version: '${version}'
 main: zxc.mrdrag0nxyt.nightcodes.NightCodes
 api-version: '1.16'
-authors: [MrDrag0nXYT (drakoshaslv)]
+authors: [ MrDrag0nXYT (drakoshaslv) ]
 website: https://drakoshaslv.ru
 description: 'Let your players create referral codes!'
 
 libraries:
   - "com.zaxxer:HikariCP:5.1.0"
+  - "com.google.code.gson:gson:2.11.0"
 
 commands:
   referral:
@@ -42,6 +43,8 @@ permissions:
 
   nightcodes.admin.reload:
     default: op
+  nightcodes.admin.announceupdates:
+    default: op
 
   nightcodes.player.*:
     default: true
@@ -58,6 +61,7 @@ permissions:
     children:
       nightcodes.player.*: true
       nightcodes.admin.reload: true
+      nightcodes.admin.announceupdates: true
 
   nightcodes.*:
     default: op

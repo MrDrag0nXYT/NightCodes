@@ -44,71 +44,74 @@ public class CodeCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 0) {
             for (String message : messages.getStringList("referral.usage"))
-                plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+                sender.sendMessage(Utilities.setColor(message));
             return true;
         }
 
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             for (String message : messages.getStringList("global.only-for-players"))
-                plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+                sender.sendMessage(Utilities.setColor(message));
             return true;
         }
-
-        Player player = (Player) sender;
 
         if ((player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20) <= config.getLong("requirements.played_time", 3600L)) {
             for (String message : messages.getStringList("code.requirements.time"))
-                plugin.adventure().sender(sender).sendMessage(
+                sender.sendMessage(
                         Utilities.setColor(message)
                 );
             return true;
         }
 
         if (sender.hasPermission("nightcodes.player.activate")) {
-            try (Connection connection = database.getConnection()) {
 
-                database.getDatabaseWorker().useCode(
-                        connection,
-                        player.getName(),
-                        player.getUniqueId(),
-                        args[0]
-                );
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                try (Connection connection = database.getConnection()) {
 
-                for (String bonusCommand : config.getStringList("commands")) {
-                    bonusCommand = bonusCommand
-                            .replace("%codeOwner%", args[0])
-                            .replace("%player%", player.getName());
+                    database.getDatabaseWorker().useCode(
+                            connection,
+                            player.getName(),
+                            player.getUniqueId(),
+                            args[0]
+                    );
 
-                    plugin.getServer().dispatchCommand(Bukkit.getConsoleSender(), bonusCommand);
+                    for (String bonusCommand : config.getStringList("commands")) {
+                        String finalBonusCommand = bonusCommand
+                                .replace("%codeOwner%", args[0])
+                                .replace("%player%", player.getName());
+
+                        Bukkit.getScheduler().runTask(plugin, () -> {
+                            plugin.getServer().dispatchCommand(Bukkit.getConsoleSender(), finalBonusCommand);
+                        });
+                    }
+
+                    for (String message : messages.getStringList("code.activated"))
+                        sender.sendMessage(
+                                Utilities.setColor(message.replace("%referral_code%", args[0]))
+                        );
+
+                } catch (SQLException e) {
+                    for (String message : messages.getStringList("global.database-error"))
+                        sender.sendMessage(Utilities.setColor(message));
+
+                } catch (CodeNotFoundException e) {
+                    for (String message : messages.getStringList("code.not-found"))
+                        sender.sendMessage(
+                                Utilities.setColor(message.replace("%referral_code%", args[0]))
+                        );
+
+                } catch (CodeAlreadyUsedException e) {
+                    for (String message : messages.getStringList("code.already-activated"))
+                        sender.sendMessage(Utilities.setColor(message));
+
+                } catch (CannotActivateOwnCodeException e) {
+                    for (String message : messages.getStringList("code.cannot-activate-own-code"))
+                        sender.sendMessage(Utilities.setColor(message));
                 }
-
-                for (String message : messages.getStringList("code.activated"))
-                    plugin.adventure().sender(sender).sendMessage(
-                            Utilities.setColor(message.replace("%referral_code%", args[0]))
-                    );
-
-            } catch (SQLException e) {
-                for (String message : messages.getStringList("global.database-error"))
-                    plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
-
-            } catch (CodeNotFoundException e) {
-                for (String message : messages.getStringList("code.not-found"))
-                    plugin.adventure().sender(sender).sendMessage(
-                            Utilities.setColor(message.replace("%referral_code%", args[0]))
-                    );
-
-            } catch (CodeAlreadyUsedException e) {
-                for (String message : messages.getStringList("code.already-activated"))
-                    plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
-
-            } catch (CannotActivateOwnCodeException e) {
-                for (String message : messages.getStringList("code.cannot-activate-own-code"))
-                    plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
-            }
+            });
 
         } else {
             for (String message : messages.getStringList("global.no-permission"))
-                plugin.adventure().sender(sender).sendMessage(Utilities.setColor(message));
+                sender.sendMessage(Utilities.setColor(message));
             return true;
         }
 

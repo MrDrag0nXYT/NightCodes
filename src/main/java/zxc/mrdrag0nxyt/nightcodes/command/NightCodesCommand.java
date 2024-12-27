@@ -33,7 +33,7 @@ public class NightCodesCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 0) {
             for (String message : messages.getStringList("nightcodes.usage"))
-                plugin.adventure().sender(sender).sendMessage(
+                sender.sendMessage(
                         Utilities.setColor(message)
                 );
             return true;
@@ -44,15 +44,18 @@ public class NightCodesCommand implements CommandExecutor, TabCompleter {
                 if (sender.hasPermission("nightcodes.admin.reload")) {
                     plugin.reload();
                     for (String message : messages.getStringList("nightcodes.reloaded"))
-                        plugin.adventure().sender(sender).sendMessage(
+                        sender.sendMessage(
                                 MiniMessage.miniMessage().deserialize(message)
                         );
+
+                } else {
+                    for (String message : messages.getStringList("global.no-permission"))
+                        sender.sendMessage(Utilities.setColor(message));
                 }
                 break;
 
             case "about":
                 if (sender.hasPermission("nightcodes.admin.about")) {
-
                     List<String> aboutStrings = Arrays.asList(
                             " ",
                             " <#fcfcfc><#745c97>NightCodes</#745c97> plugin by <click:open_url:'https://drakoshaslv.ru'><#745c97>MrDrag0nXYT</#745c97></click></#fcfcfc>",
@@ -61,15 +64,19 @@ public class NightCodesCommand implements CommandExecutor, TabCompleter {
                     );
 
                     for (String message : aboutStrings)
-                        plugin.adventure().sender(sender).sendMessage(
+                        sender.sendMessage(
                                 MiniMessage.miniMessage().deserialize(message)
                         );
+
+                } else {
+                    for (String message : messages.getStringList("global.no-permission"))
+                        sender.sendMessage(Utilities.setColor(message));
                 }
                 break;
 
             default:
                 for (String message : messages.getStringList("nightcodes.usage"))
-                    plugin.adventure().sender(sender).sendMessage(
+                    sender.sendMessage(
                             Utilities.setColor(message)
                     );
         }
@@ -80,7 +87,7 @@ public class NightCodesCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("reload");
+            return Arrays.asList("reload", "about");
         }
 
         return Collections.emptyList();

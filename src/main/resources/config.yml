@@ -1,4 +1,3 @@
-
 #
 # Commands that will be executed on code activation
 #
@@ -12,6 +11,12 @@
 
 # Enable bStats metrics? You can see it here: https://bstats.org/plugin/bukkit/NightCodes/24236
 enable-metrics: true
+
+# Enable updates check
+update-check:
+  enabled: true
+  # If player has permission nightcodes.admin.announceupdates, he will receive message on join
+  announce-on-join: true
 
 commands:
   - 'betterdonate give %codeOwner% money 3500'

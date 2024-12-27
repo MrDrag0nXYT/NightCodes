@@ -18,8 +18,8 @@
 
 # 💾 Requirements
 
-- Java **16+**
-- Paper (or forks such as Purpur) **1.17+** <u>(not Spigot/CraftBukkit)</u>
+- Java **17+**
+- Paper (or forks such as Purpur) **1.18.2+** <u>(not Spigot/CraftBukkit)</u>
 
 # ⚡ Commands and permissions
 
