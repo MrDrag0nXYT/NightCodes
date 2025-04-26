@@ -55,7 +55,6 @@ public class CodeCommand implements CommandExecutor, TabCompleter {
         }
 
         if ((player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20) <= config.getMinimalPlayedTime()) {
-            sender.sendMessage(player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20 + " seconds, " + config.getMinimalPlayedTime() + " need");
             sender.sendMessage(messages.getCodeCannotActivateByPlayedTime());
             return false;
         }
