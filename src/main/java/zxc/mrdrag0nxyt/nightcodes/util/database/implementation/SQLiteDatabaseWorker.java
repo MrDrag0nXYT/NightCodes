@@ -11,6 +11,23 @@ import java.util.UUID;
 
 public class SQLiteDatabaseWorker implements DatabaseWorker {
 
+
+    @Override
+    public void initCodesTable(Connection connection) throws SQLException {
+        String sql = "CREATE TABLE IF NOT EXISTS `referral_codes`\n" +
+                "(\n" +
+                "    `id` INTEGER NOT NULL UNIQUE,\n" +
+                "    `username` TEXT NOT NULL UNIQUE,\n" +
+                "    `uuid` TEXT UNIQUE,\n" +
+                "    `is_paused` INTEGER NOT NULL DEFAULT 0 CHECK(is_paused >= 0 AND is_paused <= 1),\n" +
+                "    `usages` INTEGER NOT NULL DEFAULT 0,\n" +
+                "    PRIMARY KEY(`id` AUTOINCREMENT)" +
+                ");";
+
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.executeUpdate();
+    }
+
     @Override
     public ReferralCode getReferralCodeByUsername(Connection connection, String username) throws SQLException, CodeNotFoundException {
         String sql = "SELECT * FROM referral_codes WHERE username = ?";
@@ -56,22 +73,6 @@ public class SQLiteDatabaseWorker implements DatabaseWorker {
     }
 
     @Override
-    public void initCodesTable(Connection connection) throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS `referral_codes`\n" +
-                "(\n" +
-                "    `id` INTEGER NOT NULL UNIQUE,\n" +
-                "    `username` TEXT NOT NULL UNIQUE,\n" +
-                "    `uuid` TEXT UNIQUE,\n" +
-                "    `is_paused` INTEGER NOT NULL DEFAULT 0 CHECK(is_paused >= 0 AND is_paused <= 1),\n" +
-                "    `usages` INTEGER NOT NULL DEFAULT 0,\n" +
-                "    PRIMARY KEY(`id` AUTOINCREMENT)" +
-                ");";
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.executeUpdate();
-    }
-
-    @Override
     public void createReferralCode(Connection connection, ReferralCode referralCode) throws SQLException {
         String sql;
 
@@ -83,41 +84,45 @@ public class SQLiteDatabaseWorker implements DatabaseWorker {
     }
 
     @Override
-    public void deleteReferralCode(Connection connection, String username) throws SQLException {
-        String sql = "DELETE FROM referral_codes WHERE username = ?";
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setString(1, username);
-        statement.executeUpdate();
-    }
-
-    @Override
-    public void setPaused(Connection connection, String username, byte isPaused) throws SQLException {
-        String sql = "UPDATE referral_codes SET is_paused = ? WHERE username = ?";
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setByte(1, isPaused);
-        statement.setString(2, username);
-        statement.executeUpdate();
-    }
-
-    @Override
-    public void deleteReferralCodeByUuid(Connection connection, UUID uuid) throws SQLException {
+    public void deleteReferralCode(Connection connection, UUID uuid) throws SQLException, CodeNotFoundException {
         String sql = "DELETE FROM referral_codes WHERE uuid = ?";
 
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setString(1, uuid.toString());
-        statement.executeUpdate();
+        int changed = statement.executeUpdate();
+
+        if (changed == 0) {
+            throw new CodeNotFoundException();
+        }
     }
 
     @Override
-    public void setPausedByUuid(Connection connection, UUID uuid, boolean isPaused) throws SQLException {
-        String sql = "UPDATE referral_codes SET is_paused = ? WHERE uuid = ?";
+    public boolean setPaused(Connection connection, UUID uuid, boolean isPaused) throws SQLException, CodeNotFoundException {
+        String sql = "UPDATE referral_codes SET is_paused = ? WHERE uuid = ? AND is_paused = ?";
 
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setBoolean(1, isPaused);
         statement.setString(2, uuid.toString());
-        statement.executeUpdate();
+        statement.setBoolean(3, !isPaused);
+        int changed = statement.executeUpdate();
+
+        if (changed == 0) {
+            sql = "SELECT COUNT(*) FROM referral_codes WHERE uuid = ?";
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, uuid.toString());
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                if (count == 0) {
+                    throw new CodeNotFoundException();
+                }
+            }
+
+            return false;
+        } else {
+            return true;
+        }
     }
 
 
@@ -155,17 +160,17 @@ public class SQLiteDatabaseWorker implements DatabaseWorker {
                     searchResultSet.getLong("usages")
             );
 
-            if (foundCode.getUsername().equals(username)) {
+            if (foundCode.getUuid().equals(uuid)) {
                 throw new CannotActivateOwnCodeException();
             }
         } else {
             throw new CodeNotFoundException();
         }
 
-        String checkUsedCodeSql = "SELECT * FROM used_referral_codes WHERE username = ?";
+        String checkUsedCodeSql = "SELECT COUNT(*) FROM used_referral_codes WHERE uuid = ?";
 
         PreparedStatement checkUsedCodeStatement = connection.prepareStatement(checkUsedCodeSql);
-        checkUsedCodeStatement.setString(1, username);
+        checkUsedCodeStatement.setString(1, uuid.toString());
         ResultSet checkUsedCodeResultSet = checkUsedCodeStatement.executeQuery();
 
         if (checkUsedCodeResultSet.next()) {

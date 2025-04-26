@@ -10,6 +10,9 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 public interface DatabaseWorker {
+
+    void initUsedCodeTable(Connection connection) throws SQLException;
+
     ReferralCode getReferralCodeByUsername(Connection connection, String username) throws SQLException, CodeNotFoundException;
 
     ReferralCode getReferralCodeByUuid(Connection connection, UUID uuid) throws SQLException, CodeNotFoundException;
@@ -18,15 +21,9 @@ public interface DatabaseWorker {
 
     void createReferralCode(Connection connection, ReferralCode referralCode) throws SQLException;
 
-    void deleteReferralCode(Connection connection, String username) throws SQLException;
+    void deleteReferralCode(Connection connection, UUID uuid) throws SQLException, CodeNotFoundException;
 
-    void setPaused(Connection connection, String username, byte isPaused) throws SQLException;
-
-    void deleteReferralCodeByUuid(Connection connection, UUID uuid) throws SQLException;
-
-    void setPausedByUuid(Connection connection, UUID uuid, boolean isPaused) throws SQLException;
-
-    void initUsedCodeTable(Connection connection) throws SQLException;
+    boolean setPaused(Connection connection, UUID uuid, boolean isPaused) throws SQLException, CodeNotFoundException;
 
     void useCode(Connection connection, String username, UUID uuid, String referralCode) throws SQLException, CodeNotFoundException, CodeAlreadyUsedException, CannotActivateOwnCodeException;
 }

@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class DatabaseManager {
 
     private final NightCodes plugin;
-    private YamlConfiguration pluginConfig;
+    private final Config config;
 
     private HikariDataSource dataSource;
     @Getter
@@ -23,7 +23,7 @@ public class DatabaseManager {
 
     public DatabaseManager(NightCodes plugin, Config config) {
         this.plugin = plugin;
-        this.pluginConfig = config.getConfig();
+        this.config = config;
 
         initConnection();
     }
@@ -31,7 +31,7 @@ public class DatabaseManager {
     private void initConnection() {
         HikariConfig hikariConfig = new HikariConfig();
 
-        switch (pluginConfig.getString("database.type", "SQLITE").toLowerCase()) {
+        switch (config.getDatabaseType()) {
             default:
                 hikariConfig.setJdbcUrl("jdbc:sqlite:" + plugin.getDataFolder() + File.separator + "database.db");
                 databaseWorker = new SQLiteDatabaseWorker();
@@ -39,6 +39,14 @@ public class DatabaseManager {
         }
 
         dataSource = new HikariDataSource(hikariConfig);
+
+        try (Connection connection = dataSource.getConnection()) {
+            databaseWorker.initCodesTable(connection);
+            databaseWorker.initUsedCodeTable(connection);
+
+        } catch (SQLException e) {
+            plugin.getLogger().severe(e.getMessage());
+        }
     }
 
     public Connection getConnection() throws SQLException {
@@ -49,5 +57,14 @@ public class DatabaseManager {
         if (dataSource != null) {
             dataSource.close();
         }
+    }
+
+    public void reloadConnection() {
+        closeConnection();
+        initConnection();
+    }
+
+    public enum DatabaseType {
+        SQLITE
     }
 }

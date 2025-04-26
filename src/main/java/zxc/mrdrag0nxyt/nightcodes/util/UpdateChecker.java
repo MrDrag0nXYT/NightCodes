@@ -2,6 +2,8 @@ package zxc.mrdrag0nxyt.nightcodes.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,20 +17,17 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UpdateChecker {
 
     private static final String UPDATE_CHECKER_URL = "https://api.github.com/repos/MrDrag0nXYT/NightCodes/releases/latest";
 
-    private final NightCodes plugin;
     private static UpdateEntity updateEntity = null;
+    private static final List<Component> updateMessage = new ArrayList<>();
 
     public UpdateChecker(NightCodes plugin, Config config) {
-        this.plugin = plugin;
-
-        if (config.getConfig().getBoolean("update-check.announce-on-join", true))
-            Bukkit.getPluginManager().registerEvents(new JoinAnnouncer(plugin), plugin);
-
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 HttpURLConnection connection = (HttpURLConnection) new URL(UPDATE_CHECKER_URL).openConnection();
@@ -54,8 +53,21 @@ public class UpdateChecker {
 
                 if (updateEntity != null) {
                     String currentVersion = plugin.getDescription().getVersion();
+
                     if (!updateEntity.tag_name.equals(currentVersion)) {
-                        announceUpdate(plugin.getServer().getConsoleSender(), currentVersion);
+                        MiniMessage miniMessage = MiniMessage.miniMessage();
+
+                        updateMessage.add(miniMessage.deserialize(" "));
+                        updateMessage.add(miniMessage.deserialize("<#a880ff>NightCodes <#696969>> <#fffafa>There are found update <#a880ff>" + updateEntity.name));
+                        updateMessage.add(miniMessage.deserialize("<#fffafa>Your version - <#dc143c>" + currentVersion + "</#dc143c>, available <#00ff7f>" + updateEntity.tag_name + "</#00ff7f>"));
+                        updateMessage.add(miniMessage.deserialize(" "));
+                        updateMessage.add(miniMessage.deserialize("<#fffafa>You can download it here - <#a880ff><click:open_url:'" + updateEntity.html_url + "'>" + updateEntity.html_url + "</click>"));
+                        updateMessage.add(miniMessage.deserialize(" "));
+
+                        announceUpdate(plugin.getServer().getConsoleSender());
+
+                        if (config.isUpdatesAnnounceEnabled())
+                            Bukkit.getPluginManager().registerEvents(new JoinAnnouncer(), plugin);
                     }
                 }
 
@@ -67,38 +79,22 @@ public class UpdateChecker {
     }
 
     private static class JoinAnnouncer implements Listener {
-
-        private final NightCodes nightCodes;
-
-        public JoinAnnouncer(NightCodes nightCodes) {
-            this.nightCodes = nightCodes;
-        }
-
         @EventHandler
         public void AnnounceUpdateOnJoin(PlayerJoinEvent event) {
             Player player = event.getPlayer();
             if (player.hasPermission("nightcodes.admin.announceupdates")) {
-                if (updateEntity != null) {
-                    String currentVersion = nightCodes.getDescription().getVersion();
-                    if (!updateEntity.tag_name.equals(currentVersion)) {
-                        announceUpdate(player, currentVersion);
-                    }
-                }
+                announceUpdate(player);
             }
         }
-
     }
 
     private static record UpdateEntity(String tag_name, String name, String html_url) {
     }
 
-    private static void announceUpdate(CommandSender sender, String currentVersion) {
-        sender.sendMessage(Utilities.setColor(" "));
-        sender.sendMessage(Utilities.setColor("<#a880ff>NightCodes <#696969>> <#fffafa>There are found update <#a880ff>" + updateEntity.name));
-        sender.sendMessage(Utilities.setColor("<#fffafa>Your version - <#dc143c>" + currentVersion + "</#dc143c>, available <#00ff7f>" + updateEntity.tag_name + "</#00ff7f>"));
-        sender.sendMessage(Utilities.setColor(" "));
-        sender.sendMessage(Utilities.setColor("<#fffafa>You can download it here - <#a880ff><click:open_url:'" + updateEntity.html_url + "'>" + updateEntity.html_url + "</click>"));
-        sender.sendMessage(Utilities.setColor(" "));
+    private static void announceUpdate(CommandSender sender) {
+        for (Component component : updateMessage) {
+            sender.sendMessage(component);
+        }
     }
 
 }
