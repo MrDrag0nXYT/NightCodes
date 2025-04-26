@@ -1,56 +1,42 @@
 package zxc.mrdrag0nxyt.nightcodes.config;
 
 import lombok.Getter;
-import org.bukkit.configuration.file.YamlConfiguration;
 import zxc.mrdrag0nxyt.nightcodes.NightCodes;
-import zxc.mrdrag0nxyt.nightcodes.util.Utilities;
+import zxc.mrdrag0nxyt.nightcodes.util.database.DatabaseManager;
 
-import java.io.File;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Config {
+@Getter
+public class Config extends AbstractConfig {
 
-    private final NightCodes plugin;
-    private final File file;
-    @Getter
-    private YamlConfiguration config;
+    private boolean isMetricsEnabled = true;
+    private boolean isUpdateCheckEnabled, isUpdatesAnnounceEnabled = true;
+
+    private List<String> onCodeUseCommands = List.of(
+            "betterdonate give %codeOwner% money 3500",
+            "p give %codeOwner% 10",
+            "p give %player% 5"
+    );
+    private long minimalPlayedTime;
+
+    private DatabaseManager.DatabaseType databaseType;
 
     public Config(NightCodes plugin) {
-        this.plugin = plugin;
-        file = new File(plugin.getDataFolder(), "config.yml");
-        load();
+        super(plugin, "config.yml");
     }
 
-    private void extractIfNotExists() {
-        if (!file.exists()) {
-            plugin.saveResource("config.yml", false);
-        }
-    }
+    @Override
+    protected void updateConfig() {
+        isMetricsEnabled = checkValue("enable-metrics", isMetricsEnabled);
+        isUpdateCheckEnabled = checkValue("update-check.enabled", isUpdateCheckEnabled);
+        isUpdatesAnnounceEnabled = checkValue("update-check.announce-on-join", isUpdatesAnnounceEnabled);
 
-    private void load() {
-        extractIfNotExists();
-        config = YamlConfiguration.loadConfiguration(file);
+        onCodeUseCommands = checkValue("commands", onCodeUseCommands);
+        minimalPlayedTime = (long) checkValue("requirements.played-time", 3600);
 
-        Utilities.checkValue(config, "database.type", "SQLITE");
-        Utilities.checkValue(config, "commands", 3600L);
-        Utilities.checkValue(config, "requirements.played_time", Arrays.asList("betterdonate give %codeOwner% money 3500", "p give %codeOwner% 10", "p give %player% 5"));
-    }
-
-    public void save() {
-        try {
-            config.save(file);
-        } catch (Exception e) {
-            plugin.getLogger().severe(String.valueOf(e));
-        }
-    }
-
-    public void reload() {
-        extractIfNotExists();
-        try {
-            config.load(file);
-        } catch (Exception e) {
-            plugin.getLogger().severe(String.valueOf(e));
-        }
+        String databaseTypeString = checkValue("database.type", "SQLITE");
+        databaseType = DatabaseManager.DatabaseType.valueOf(databaseTypeString);
     }
 
 }
